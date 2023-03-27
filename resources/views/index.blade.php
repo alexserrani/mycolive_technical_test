@@ -51,47 +51,46 @@
     });
 </script>
     
-   <script>
-      let timeLeft = 30;
-      const countdownEl = document.getElementById('countdown');
-      const questionEl = document.getElementById('question');
-      const labels = [document.getElementById('label1'), document.getElementById('label2'), document.getElementById('label3'), document.getElementById('label4')];
-  
-     
-      // Function to render a question and its answers on the page
-      function renderQuestion(currentQuestion) {
-        questionEl.textContent = currentQuestion.question;
-        labels[0].textContent = currentQuestion.answers[0];
-        labels[1].textContent = currentQuestion.answers[1];
-        labels[2].textContent = currentQuestion.answers[2];
-        labels[3].textContent = currentQuestion.answers[3];
-      }
-  
-      // Array of questions
-      const questions = [
-        {
-          question: "What is the capital of France?",
-          correct_answer: "Paris",
-          answers: ["London", "Berlin", "Rome", "Paris"]
-        },
-        {
-          question: "What is the largest planet in our solar system?",
-          correct_answer: "Jupiter",
-          answers: ["Mars", "Venus", "Jupiter", "Saturn"]
-        },
-        // Add more questions here
-      ];
-  
-      // User's score
-      let score = 0;
-  
-      // ...
-    
-      }
+  <script>
+    let timeLeft = 30;
+    const countdownEl = document.getElementById('countdown');
+    const questionEl = document.getElementById('question');
+    const labels = [document.getElementById('label1'), document.getElementById('label2'), document.getElementById('label3'), document.getElementById('label4')];
+    const progressBar = document.querySelector('.progress-bar');
+    let progress = 100;
+    let currentQuestion = null;
+    let questionIndex = 0;
+    let score = 0;
+
+    // Function to render a question and its answers on the page
+    function renderQuestion() {
+        questionEl.textContent = decodeURIComponent(currentQuestion.question);
+        labels[0].textContent = decodeURIComponent(currentQuestion.answers[0]);
+        labels[1].textContent = decodeURIComponent(currentQuestion.answers[1]);
+        labels[2].textContent = decodeURIComponent(currentQuestion.answers[2]);
+        labels[3].textContent = decodeURIComponent(currentQuestion.answers[3]);
+    }
+
+    // Function to fetch questions from API and render them on the page
+    function fetchQuestions() {
+        fetch('https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple&encode=url3986')
+        .then(response => response.json())
+        .then(data => {
+            questions = data.results.map(result => ({
+                question: result.question,
+                correct_answer: result.correct_answer,
+                answers: [...result.incorrect_answers, result.correct_answer].map(answer => encodeURIComponent(answer))
+            }));
+            currentQuestion = questions[questionIndex];
+            renderQuestion(currentQuestion);
+            updateProgressBar();
+        })
+        .catch(error => {
+            console.error('An error occurred while fetching questions:', error);
+        });
+    }
 
     // Set the initial value of the progress bar
-    let progress = 100;
-    const progressBar = document.getElementById('progress-bar');
     progressBar.style.width = progress + '%';
 
     // Update the progress bar
@@ -104,7 +103,6 @@
     function updateCountdown() {
         countdownEl.innerHTML = timeLeft + ' seconds left';
         timeLeft--;
-
         if (timeLeft < 0) {
             clearInterval(countdownInterval);
             alert('Time is up!');
@@ -117,13 +115,12 @@
 
     // Handle the user's answer
     function handleAnswer(answer) {
-        if (answer === currentQuestion.correct_answer) {
+        if (answer === decodeURIComponent(currentQuestion.correct_answer)) {
             alert('Correct!');
             score++;
         } else {
             alert('Incorrect!');
         }
-
         if (questionIndex === questions.length - 1) {
             clearInterval(countdownInterval);
             alert(`Quiz finished! Your score is ${score}/${questions.length}`);
@@ -135,6 +132,9 @@
             updateProgressBar();
         }
     }
+
+    // Fetch questions and start the game
+    fetchQuestions();
 </script>
 
 
