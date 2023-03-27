@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -11,29 +12,30 @@ class AuthController extends Controller
         return view('login');
     }
 
-   public function register(Request $request)
-{
-    $validatedData = $request->validate([
-        'username' => 'required|unique:users|max:30|min:6',
-        'password' => 'required|max:30|min:6',
-        'password_confirmation' => 'required|same:password',
-    ], [
-        'username.required' => 'The username field is required.',
-        'username.unique' => 'The username is already taken.',
-        'username.max' => 'The username may not be greater than 30 characters.',
-        'username.min' => 'The username must be at least 6 characters.',
-        'password.required' => 'The password field is required.',
-        'password.max' => 'The password may not be greater than 30 characters.',
-        'password.min' => 'The password must be at least 6 characters.',
-        'password_confirmation.required' => 'The password confirmation field is required.',
-        'password_confirmation.same' => 'The password confirmation does not match.',
-    ]);
+    public function authenticate(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => 'required|max:30|min:6',
+            'password' => 'required|max:30|min:6',
+        ], [
+            'username.required' => 'The username field is required.',
+            'username.max' => 'The username may not be greater than 30 characters.',
+            'username.min' => 'The username must be at least 6 characters.',
+            'password.required' => 'The password field is required.',
+            'password.max' => 'The password may not be greater than 30 characters.',
+            'password.min' => 'The password must be at least 6 characters.',
+        ]);
 
-    $user = new User();
-    $user->username = $validatedData['username'];
-    $user->password = bcrypt($validatedData['password']);
-    $user->save();
+        if (Auth::attempt($credentials)) {
+            return redirect('/');
+        } else {
+            return back()->withErrors(['credentials' => 'Invalid credentials']);
+        }
+    }
 
-    return redirect('/login');
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
 }
-
