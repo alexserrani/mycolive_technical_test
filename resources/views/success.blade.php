@@ -11,7 +11,7 @@
             </div>
             <div class="result-container">
                 <div class="top">
-                    <h2>Congratulation {INSERT_USERNAME_HERE} </h2>
+                    <h2>Congratulation {{ $username }} </h2>
                 </div>
 
                 <div class= "middle">
