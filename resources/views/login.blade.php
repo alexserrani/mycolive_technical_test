@@ -12,22 +12,20 @@
                 </div>
 
                 <div class="form-container">
-                    <input type="username" placeholder="username" required>
+                    <input type="text" placeholder="username" required name="username">
                 </div>
 
                 <div class="form-container">
-                    <input type="password" placeholder="password" required>
+                    <input type="password" placeholder="password" required name="password">
                 </div>
 
-                <button class="button-submit">Start Game</button>
+                <button class="button-submit" type="submit">Start Game</button>
 
                 <span class="redirect">
                     No account? <a href="/register">Register here</a>
                 </span>
             </form>
         </div>
-
-
     </div>
 </body>
 @endsection
