@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -27,15 +28,38 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            return redirect('/');
-        } else {
-            return back()->withErrors(['credentials' => 'Invalid credentials']);
+            $request->session()->regenerate();
+
+            return redirect()->intended('/');
         }
+
+        return back()->withErrors([
+            'username' => 'The provided credentials do not match our records.',
+        ]);
     }
 
-    public function logout()
+    public function register(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|unique:users|max:30|min:6',
+            'password' => 'required|max:30|min:6',
+            'password_confirmation' => 'required|same:password'
+        ]);
+
+        $user = new User;
+        $user->username = $request->username;
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return redirect('/login');
+    }
+
+    public function logout(Request $request)
     {
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect('/login');
     }
 }
