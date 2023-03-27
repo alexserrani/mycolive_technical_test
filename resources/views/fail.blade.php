@@ -12,7 +12,7 @@
             <div class="result-container">
 
                 <div class= "middle">
-                    <p>You have answered correctly {INSERT_USER_SCORE_HERE} % of the trivia questions </p>
+                    <p>You have answered correctly {{ $userScore }} % of the trivia questions </p>
                 </div>
 
                 <div class="redirect">
